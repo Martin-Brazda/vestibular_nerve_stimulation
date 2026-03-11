@@ -7,10 +7,15 @@ if not pi.connected:
     print("Unable to connect to pigpiod")
     exit()
 
-p.set_mode(18, pigpio.OUTPUT)
+arr = [0, 125000, 250000, 500000, 1000000]
 
-for i in range(10):
-    pi.write(18, 1)
-    time.sleep(0.5)
-    pi.write(18, 0)
-    time.sleep(0.5)
+try:
+    for i in arr[::-1]:
+        print(f"Intensity: {i/10000}%")
+        pi.hardware_PWM(18, 100, i)
+        time.sleep(2)
+
+except KeyboardInterrupt:
+    pass
+finally:
+    pi.stop()
