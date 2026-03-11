@@ -17,6 +17,7 @@ class GVS:
             self.emergency_stop()
         except:
             pass
+        return None
 
     def init(self):
         result = self.lib.gvs_init()
