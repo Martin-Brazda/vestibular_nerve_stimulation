@@ -75,7 +75,7 @@ async function rampTo(target) {
     if (dir < 0 && state.intensity <= target) state.intensity = target;
     updateIntensityUI(state.intensity, false);
     try { await writeChar(BLE.INTENSITY, state.intensity); }
-    catch (e) { stopRamp(); toast('Write failed during ramp', 'error'); return; }
+    catch (e) { console.error('ramp write error:', e); stopRamp(); toast('Write failed during ramp', 'error'); return; }
     if (state.intensity === target) {
       stopRamp();
       toast(`Intensity → ${target}%`, 'success', 2000);
@@ -194,6 +194,7 @@ async function disconnect() {
 }
 
 async function onDisconnected() {
+  console.warn('BLE: gattserverdisconnected');
   stopRamp();
   state.connected = false;
   state.stimulating = false;
@@ -224,6 +225,7 @@ async function setStimulation(active, skipRamp = false) {
     }
     updateStartStopBtn();
   } catch (e) {
+    console.error('setStimulation error:', e);
     toast(`Control error: ${e.message}`, 'error');
   }
 }
@@ -234,7 +236,7 @@ function rampDown() {
     const iv = setInterval(async () => {
       state.intensity = Math.max(0, state.intensity - state.rampRate);
       updateIntensityUI(state.intensity, true);
-      try { await writeChar(BLE.INTENSITY, state.intensity); } catch(_) {}
+      try { await writeChar(BLE.INTENSITY, state.intensity); } catch(e) { console.error('rampDown write error:', e); }
       if (state.intensity <= 0) { clearInterval(iv); resolve(); }
     }, 120);
   });
@@ -286,7 +288,7 @@ function wireEvents() {
     state.intensity = v;
     updateIntensityUI(v);
     if (state.connected && state.stimulating)
-      try { await writeChar(BLE.INTENSITY, v); } catch(e) { toast(e.message, 'error'); }
+      try { await writeChar(BLE.INTENSITY, v); } catch(e) { console.error('intensity- write error:', e); toast(e.message, 'error'); }
   });
 
   $('btn-intensity-plus').addEventListener('click', async () => {
@@ -295,7 +297,7 @@ function wireEvents() {
     state.intensity = v;
     updateIntensityUI(v);
     if (state.connected)
-      try { await writeChar(BLE.INTENSITY, v); } catch(e) { toast(e.message, 'error'); }
+      try { await writeChar(BLE.INTENSITY, v); } catch(e) { console.error('intensity+ write error:', e); toast(e.message, 'error'); }
   });
 
   document.querySelectorAll('.dir-btn').forEach(btn => {
@@ -303,7 +305,7 @@ function wireEvents() {
       state.direction = parseInt(btn.dataset.dir);
       updateDirectionUI(state.direction);
       if (state.connected)
-        try { await writeChar(BLE.DIRECTION, state.direction); } catch(e) { toast(e.message, 'error'); }
+        try { await writeChar(BLE.DIRECTION, state.direction); } catch(e) { console.error('direction write error:', e); toast(e.message, 'error'); }
     });
   });
 
@@ -312,7 +314,7 @@ function wireEvents() {
     state.frequency = v;
     $('freq-input').value = v;
     if (state.connected)
-      try { await writeChar(BLE.FREQUENCY, v); } catch(e) { toast(e.message, 'error'); }
+      try { await writeChar(BLE.FREQUENCY, v); } catch(e) { console.error('frequency write error:', e); toast(e.message, 'error'); }
   });
 
   document.querySelectorAll('.preset-btn').forEach(btn => {
@@ -321,7 +323,7 @@ function wireEvents() {
       state.frequency = v;
       $('freq-input').value = v;
       if (state.connected)
-        try { await writeChar(BLE.FREQUENCY, v); } catch(e) { toast(e.message, 'error'); }
+        try { await writeChar(BLE.FREQUENCY, v); } catch(e) { console.error('freq preset write error:', e); toast(e.message, 'error'); }
     });
   });
 
@@ -333,7 +335,7 @@ function wireEvents() {
 
 function registerSW() {
   if ('serviceWorker' in navigator)
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
+    navigator.serviceWorker.register('./sw.js').catch(e => console.error('SW registration error:', e));
 }
 
 document.addEventListener('DOMContentLoaded', () => {
