@@ -59,10 +59,6 @@ def main(adapter_address, gvs):
 
     gvs_device.publish()
 
-if __name__ == "__main__":
-    with GVS() as gvs:
-        main(list(adapter.Adapter.available())[0].address, gvs)
-
 def on_intensity_write(value, options):
     try:
         gvs.set_intensity(int.from_bytes(value, byteorder='little'))
@@ -88,3 +84,7 @@ def on_status_write(value, options):
     except Exception as e:
         print(f"set status error: {e}")
         pass
+
+if __name__ == "__main__":
+    with GVS() as gvs:
+        main(list(adapter.Adapter.available())[0].address, gvs)
