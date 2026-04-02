@@ -61,26 +61,29 @@ def main(adapter_address, gvs):
 
 def on_intensity_write(value, options):
     try:
+        print(f"received intensity write: {value}")
         gvs.set_intensity(int.from_bytes(value, byteorder='little'))
     except Exception as e:
         print(f"set intensity error: {e}")    
 
 def on_direction_write(value, options):
     try:
+        print(f"received direction write: {value}")
         gvs.set_direction(int.from_bytes(value, byteorder='little'))
-        print(f"changing direction to: {value}")
     except Exception as e:
         print(f"set direction error: {e}")
         pass
 
 def on_frequency_write(value, options):
     try:
+        print(f"received frequency write: {value}")
         gvs.set_frequency(int.from_bytes(value, byteorder='little'))
     except Exception as e:
         print(f"set frequency error: {e}")
 
 def on_status_write(value, options):
     try:
+        print(f"received status write: {value}")
         gvs.set_status(int.from_bytes(value, byteorder='little'))
     except Exception as e:
         print(f"set status error: {e}")
