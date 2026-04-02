@@ -68,6 +68,7 @@ def on_intensity_write(value, options):
 def on_direction_write(value, options):
     try:
         gvs.set_direction(int.from_bytes(value, byteorder='little'))
+        print(f"changing direction to: {value}")
     except Exception as e:
         print(f"set direction error: {e}")
         pass

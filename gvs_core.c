@@ -84,9 +84,7 @@ int set_direction(int direction) {
     }
     
     state.direction = direction;
-    if (state.running) {
-        gvs_start();
-    }
+    gvs_start();
     return 0;
 }
 
@@ -98,8 +96,6 @@ int set_status(int status) {
     state.running = status;
     if (state.running) {
         gvs_start();
-    } else {
-        gvs_stop();
     }
     return 0;
 }
